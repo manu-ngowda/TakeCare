@@ -1,0 +1,44 @@
+[
+  {
+    "symptoms": "Patient has crushing chest pain, sweating, and pain radiating to the left arm.",
+    "expected_department": "Cardiology Emergency",
+    "expected_priority": 1,
+    "expected_protocol": "KB001"
+  },
+  {
+    "symptoms": "Child aged 3, fever of 104.5°F for two days, difficulty breathing.",
+    "expected_department": "Pediatrics Emergency",
+    "expected_priority": 1,
+    "expected_protocol": "KB002"
+  },
+  {
+    "symptoms": "Sudden face drooping, slurred speech, weakness in right arm started 30 minutes ago.",
+    "expected_department": "Neurology Emergency",
+    "expected_priority": 1,
+    "expected_protocol": "KB003"
+  },
+  {
+    "symptoms": "Hives all over body, throat feels tight, trouble breathing after eating peanuts.",
+    "expected_department": "Emergency Medicine",
+    "expected_priority": 1,
+    "expected_protocol": "KB004"
+  },
+  {
+    "symptoms": "Patient has a small cut on the finger, no bleeding, no other symptoms.",
+    "expected_department": "Minor Injuries Unit",
+    "expected_priority": 4,
+    "expected_protocol": "KB016"
+  },
+  {
+    "symptoms": "Knee pain and swelling after falling on stairs, cannot put weight on leg.",
+    "expected_department": "Orthopaedics",
+    "expected_priority": 3,
+    "expected_protocol": "KB011"
+  },
+  {
+    "symptoms": "Here for scheduled flu vaccination, feeling fine, no complaints.",
+    "expected_department": "General Outpatient",
+    "expected_priority": 4,
+    "expected_protocol": "KB025"
+  }
+]

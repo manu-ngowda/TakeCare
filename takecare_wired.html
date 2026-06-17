@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TakeCare — GenAI Healthcare Patient Intake System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #DDD8CF;
+    --border-strong: #B8B0A0;
+    --text: #1A1814;
+    --text-2: #6B6560;
+    --text-3: #9E9890;
+    --accent: #1A5C4A;
+    --accent-light: #E8F2EE;
+    --accent-mid: #2D7A62;
+    --red: #C0392B;
+    --red-light: #FAEAE8;
+    --amber: #B7580A;
+    --amber-light: #FBF0E6;
+    --blue: #1B4F8A;
+    --blue-light: #EAF0F8;
+    --tag-font: 'DM Mono', monospace;
+    --body-font: 'Instrument Sans', sans-serif;
+    --display-font: 'DM Serif Display', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--body-font);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ---- NAVIGATION ---- */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: var(--display-font);
+    font-size: 20px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-logo .cross {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-logo .cross::before {
+    content: '+';
+    color: white;
+    font-size: 16px;
+    font-family: var(--body-font);
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .nav-tab {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    font-family: var(--body-font);
+  }
+
+  .nav-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2ECC71;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ---- SCREENS ---- */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ---- LAYOUT ---- */
+  .page-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-header h1 {
+    font-family: var(--display-font);
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-2);
+  }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-label {
+    font-family: var(--tag-font);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+
+  /* ---- BADGES ---- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--tag-font);
+  }
+
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-green { background: var(--accent-light); color: var(--accent); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-gray { background: var(--surface2); color: var(--text-2); }
+
+  /* ============================
+     SCREEN 1 — INTAKE CHAT
+  ============================== */
+  .intake-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .intake-layout.chat-only {
+    grid-template-columns: 1fr;
+  }
+
+  #patient-panel {
+    display: none;
+  }
+
+  #patient-panel.visible {
+    display: block;
+  }
+
+  .modal-location {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-family: var(--tag-font);
+  }
+
+  .modal-priority {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 20px;
+  }
+
+  /* Left panel */
+  .patient-panel {}
+
+  .patient-form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--tag-font);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    font-family: var(--body-font);
+    outline: none;
+  }
+
+  .form-input:focus {
+    border-color: var(--accent-mid);
+    background: var(--surface);
+  }
+
+  .form-input::placeholder { color: var(--text-3); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .vital-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+  }
+
+  .vital-label {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--tag-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .vital-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+    font-family: var(--tag-font);
+  }
+
+  .vital-value.alert { color: var(--red); }
+  .vital-unit { font-size: 11px; color: var(--text-3); margin-left: 2px; font-weight: 400; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* Chat panel */
+  .chat-panel {}
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .chat-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ai-chip {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: var(--tag-font);
+  }
+
+  .chat-window {
+    height: 320px;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    max-width: 92%;
+  }
+
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .msg.bot .msg-avatar { background: var(--accent); color: white; font-family: var(--tag-font); }
+  .msg.user .msg-avatar { background: var(--surface2); color: var(--text-2); font-family: var(--body-font); }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .msg.bot .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-top-left-radius: 2px;
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--accent);
+    color: white;
+    border-top-right-radius: 2px;
+  }
+
+  .msg-time {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--tag-font);
+    margin-top: 4px;
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    border-top-left-radius: 2px;
+    width: fit-content;
+  }
+
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-3);
+    animation: typing 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--body-font);
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+  }
+
+  .chat-input:focus { border-color: var(--accent-mid); }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--body-font);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: var(--accent-mid); }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+  }
+
+  .btn-outline:hover { background: var(--surface2); }
+
+  /* RAG indicator */
+  .rag-indicator {
+    background: var(--accent-light);
+    border: 1px solid #B8DACD;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .rag-label {
+    font-size: 11px;
+    font-family: var(--tag-font);
+    color: var(--accent);
+  }
+
+  .rag-chunks {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .chunk-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid #B8DACD;
+    color: var(--accent);
+    font-family: var(--tag-font);
+  }
+
+  /* ============================
+     SCREEN 2 — TRIAGE RESULT
+  ============================== */
+  .triage-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+  }
+
+  .triage-main {}
+
+  .severity-banner {
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .severity-banner.p1 {
+    background: var(--red-light);
+    border: 1px solid #F0B4AE;
+  }
+
+  .severity-num {
+    font-family: var(--display-font);
+    font-size: 52px;
+    line-height: 1;
+    color: var(--red);
+  }
+
+  .severity-info h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--red);
+    margin-bottom: 3px;
+  }
+
+  .severity-info p {
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .dept-routing {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .dept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .dept-card.active {
+    border-color: var(--accent-mid);
+    background: var(--accent-light);
+  }
+
+  .dept-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .dept-card.active .dept-name { color: var(--accent); }
+
+  .dept-meta {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .dept-check {
+    float: right;
+    color: var(--accent);
+    font-size: 16px;
+  }
+
+  .symptom-extraction {
+    margin-bottom: 18px;
+  }
+
+  .symptom-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .symptom-pill {
+    padding: 5px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .symptom-pill.flagged {
+    background: var(--red-light);
+    border-color: #F0B4AE;
+    color: var(--red);
+  }
+
+  /* JSON output */
+  .json-block {
+    background: #1A1814;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: var(--tag-font);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #C8C0B0;
+  }
+
+  .json-key { color: #7EC8A4; }
+  .json-string { color: #F0C674; }
+  .json-number { color: #CC99CD; }
+  .json-bool { color: #67B0D6; }
+
+  /* Timeline */
+  .timeline { display: flex; flex-direction: column; gap: 10px; }
+
+  .tl-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .tl-line-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+  }
+
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .tl-dot.gray { background: var(--border-strong); }
+
+  .tl-vline {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    min-height: 20px;
+    margin-top: 4px;
+  }
+
+  .tl-content {}
+  .tl-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .tl-desc { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+
+  /* ============================
+     SCREEN 3 — HANDOFF NOTE
+  ============================== */
+  .note-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+  }
+
+  .note-doc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 36px;
+  }
+
+  .note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 24px;
+  }
+
+  .note-logo {
+    font-family: var(--display-font);
+    font-size: 22px;
+    color: var(--accent);
+  }
+
+  .note-meta {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-2);
+    font-family: var(--tag-font);
+    line-height: 1.7;
+  }
+
+  .note-section { margin-bottom: 20px; }
+
+  .note-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: var(--tag-font);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
+
+  .note-body {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .note-body strong { font-weight: 600; }
+
+  .note-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .note-field-label { color: var(--text-2); }
+  .note-field-value { font-weight: 500; }
+
+  .note-signature {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .note-sig-label { font-size: 11px; color: var(--text-3); font-family: var(--tag-font); }
+  .note-sig-value { font-family: var(--display-font); font-size: 16px; font-style: italic; margin-top: 4px; }
+
+  .sidebar-panel { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ============================
+     SCREEN 4 — DASHBOARD
+  ============================== */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--tag-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: var(--display-font);
+    font-size: 34px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-change {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 4px;
+    font-family: var(--tag-font);
+  }
+
+  .stat-change.neg { color: var(--red); }
+
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Bar chart */
+  .bar-chart { padding-top: 8px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .bar-dept {
+    font-size: 12px;
+    color: var(--text-2);
+    width: 100px;
+    text-align: right;
+    flex-shrink: 0;
+    font-family: var(--tag-font);
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+    justify-content: flex-end;
+    transition: width 1s ease;
+  }
+
+  .bar-num {
+    font-size: 10px;
+    color: white;
+    font-family: var(--tag-font);
+  }
+
+  /* Donut */
+  .donut-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .donut-wrap {
+    position: relative;
+    width: 120px; height: 120px;
+  }
+
+  .donut-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .donut-pct {
+    font-family: var(--display-font);
+    font-size: 24px;
+  }
+
+  .donut-sub {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--tag-font);
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .patients-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .patients-table th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 10px;
+    font-family: var(--tag-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .patients-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--surface2);
+    color: var(--text);
+  }
+
+  .patients-table tr:last-child td { border-bottom: none; }
+
+  .patients-table tr:hover td { background: var(--bg); }
+
+  .priority-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .p1-dot { background: var(--red); }
+  .p2-dot { background: var(--amber); }
+  .p3-dot { background: #3498DB; }
+  .p4-dot { background: var(--accent); }
+
+  /* ============================
+     TRIAGE RESULT MODAL
+  ============================== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 24, 20, 0.55);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px 36px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: modalIn 0.3s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .modal-icon.urgent { background: var(--red-light); color: var(--red); }
+
+  .modal-title {
+    font-family: var(--display-font);
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .modal-subtitle {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .modal-dept-badge {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .modal-dept-badge.p1 { background: var(--red-light); color: var(--red); }
+  .modal-dept-badge.p2 { background: var(--amber-light); color: var(--amber); }
+  .modal-dept-badge.p3 { background: var(--blue-light); color: var(--blue); }
+  .modal-dept-badge.p4 { background: var(--accent-light); color: var(--accent); }
+
+  /* Smooth screen transitions */
+  .screen { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Architecture badge in nav */
+  .arch-badge {
+    font-size: 10px;
+    font-family: var(--tag-font);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: var(--text-2);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="cross"></div>
+    TakeCare
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goTo(0)">Patient Intake</button>
+    <button class="nav-tab" onclick="goTo(1)">Triage Result</button>
+    <button class="nav-tab" onclick="goTo(2)">Handoff Note</button>
+    <button class="nav-tab" onclick="goTo(3)">Dashboard</button>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span>Gemini RAG Active</span>
+    <span class="arch-badge">Vertex AI + Firestore</span>
+  </div>
+</nav>
+
+<!-- ============================
+     SCREEN 1 — PATIENT INTAKE
+=============================== -->
+<div id="s0" class="screen active">
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Patient Intake</h1>
+    </div>
+
+    <div class="intake-layout chat-only" id="intake-layout">
+      <!-- LEFT: Patient form (hidden until details collected in chat) -->
+      <div class="patient-panel" id="patient-panel">
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-label">Patient Registration</div>
+
+          <div class="patient-form-group">
+            <label class="form-label">Name</label>
+            <input class="form-input" id="field-name" type="text" placeholder="—" readonly>
+          </div>
+
+          <div class="form-row">
+            <div class="patient-form-group">
+              <label class="form-label">Age</label>
+              <input class="form-input" id="field-age" type="text" placeholder="—" readonly>
+            </div>
+            <div class="patient-form-group">
+              <label class="form-label">Gender</label>
+              <input class="form-input" id="field-gender" type="text" placeholder="—" readonly>
+            </div>
+          </div>
+
+          <hr class="divider">
+          <div class="card-label">From conversation</div>
+
+          <div class="patient-form-group">
+            <label class="form-label">Primary Complaint</label>
+            <input class="form-input" id="field-complaint" placeholder="—" readonly>
+          </div>
+
+          <div class="patient-form-group">
+            <label class="form-label">Onset</label>
+            <input class="form-input" id="field-onset" placeholder="—" readonly>
+          </div>
+
+          <div class="patient-form-group">
+            <label class="form-label">Allergies</label>
+            <input class="form-input" id="field-allergies" placeholder="—" readonly>
+          </div>
+        </div>
+
+        <div class="card" id="vitals-card" style="display:none">
+          <div class="card-label">Additional notes</div>
+          <div class="patient-form-group">
+            <input class="form-input" id="field-history" placeholder="—" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Chat -->
+      <div class="chat-panel">
+        <div class="card" style="height:100%">
+          <div class="chat-header">
+            <div class="chat-title">
+              MediBot Intake Agent
+              <span class="ai-chip">Gemini 1.5 Pro</span>
+            </div>
+            <div style="display:flex;gap:6px">
+              <span class="badge badge-green" id="status-badge">● Online</span>
+            </div>
+          </div>
+
+          <div class="rag-indicator" id="rag-indicator" style="display:none">
+            <span class="rag-label">↑ RAG retrieved</span>
+            <div class="rag-chunks" id="rag-chunks"></div>
+            <span style="margin-left:auto;font-size:10px;font-family:var(--tag-font);color:var(--text-3)" id="rag-score"></span>
+          </div>
+
+          <div class="chat-window" id="chat-window"></div>
+
+          <div class="chat-input-row">
+            <input class="chat-input" id="chat-input" type="text" placeholder="Type your answer…">
+            <button class="btn btn-primary" id="send-btn" onclick="handleSend()">Send →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SCREEN 2 — TRIAGE RESULT
+=============================== -->
+<div id="s1" class="screen">
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Triage Result</h1>
+    </div>
+
+    <div class="triage-layout">
+      <div class="triage-main">
+
+        <div class="severity-banner p1" id="triage-empty" style="background:var(--surface2);border-color:var(--border)">
+          <div class="severity-info">
+            <h2 style="color:var(--text-2)">Awaiting intake</h2>
+            <p>Complete the patient conversation to generate a triage result.</p>
+          </div>
+        </div>
+
+        <div id="triage-results" style="display:none">
+          <div class="severity-banner p1">
+            <div class="severity-num">—</div>
+            <div class="severity-info">
+              <h2>—</h2>
+              <p>—</p>
+            </div>
+            <span class="badge badge-gray" id="urgency-badge" style="margin-left:auto">—</span>
+          </div>
+
+          <div class="dept-routing">
+            <div class="dept-card active">
+              <span class="dept-check">✓</span>
+              <div class="dept-name">—</div>
+              <div class="dept-meta">AI-routed via RAG pipeline</div>
+              <div style="margin-top:8px"><span class="badge badge-green">Routed</span></div>
+            </div>
+          </div>
+
+          <div class="card symptom-extraction" style="margin-bottom:16px">
+            <div class="card-label">Patient summary</div>
+            <div class="symptom-list" id="symptom-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-label">Structured JSON output</div>
+            <div class="json-block" id="json-output">{}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-panel">
+        <div class="card">
+          <div class="card-label">RAG context</div>
+          <div id="rag-context-list" style="font-size:12px;color:var(--text-3)">No triage run yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SCREEN 3 — HANDOFF NOTE
+=============================== -->
+<div id="s2" class="screen">
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Clinician Handoff Note</h1>
+    </div>
+
+    <div class="note-layout">
+      <div class="note-doc">
+        <div class="note-header">
+          <div>
+            <div class="note-logo">TakeCare</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:2px;font-family:var(--tag-font)">AI-Generated Clinical Handoff</div>
+          </div>
+          <div class="note-meta" id="note-meta">—</div>
+        </div>
+
+        <div class="note-section">
+          <div class="note-section-title">Patient Identification</div>
+          <div class="note-grid-2" id="note-patient-id">
+            <span class="note-field-label">Name</span><span class="note-field-value">—</span>
+            <span class="note-field-label">Age / Gender</span><span class="note-field-value">—</span>
+            <span class="note-field-label">Allergies</span><span class="note-field-value">—</span>
+          </div>
+        </div>
+
+        <div class="note-section">
+          <div class="note-section-title">Chief Complaint & History</div>
+          <div class="note-body" id="note-complaint">Complete patient intake to generate this note.</div>
+        </div>
+
+        <div class="note-section">
+          <div class="note-section-title">Triage Assessment</div>
+          <div class="note-body" id="note-assessment">—</div>
+        </div>
+
+        <div class="note-section">
+          <div class="note-section-title">Routing Decision</div>
+          <div class="note-body" id="note-routing">—</div>
+        </div>
+
+        <div class="note-signature">
+          <div>
+            <div class="note-sig-label">Generated by</div>
+            <div class="note-sig-value">TakeCare AI</div>
+          </div>
+          <div style="text-align:right">
+            <div class="note-sig-label">Verified intake completed</div>
+            <div style="font-size:13px;font-weight:600;margin-top:3px;color:var(--accent)">✓ Intake complete</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-panel">
+        <div class="card">
+          <div class="card-label">Note Actions</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary" style="width:100%">Download PDF</button>
+            <button class="btn btn-outline" style="width:100%">Print Note</button>
+            <button class="btn btn-outline" style="width:100%">Send to Clinician</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SCREEN 4 — DASHBOARD
+=============================== -->
+<div id="s3" class="screen">
+  <div class="page-container">
+    <div class="page-header">
+      <h1>Analytics Dashboard</h1>
+      <p>Operational overview for hospital administrators — updates as patients complete intake.</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="stat-card">
+        <div class="stat-label">Patients Today</div>
+        <div class="stat-value" id="stat-patients">0</div>
+        <div class="stat-change" id="stat-patients-change">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Intake Time</div>
+        <div class="stat-value" id="stat-intake-time">—</div>
+        <div class="stat-change" id="stat-intake-change">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">P1 Cases</div>
+        <div class="stat-value" id="stat-p1" style="color:var(--red)">0</div>
+        <div class="stat-change" id="stat-p1-change">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">High Confidence</div>
+        <div class="stat-value" id="stat-confidence">—</div>
+        <div class="stat-change" id="stat-confidence-change">—</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-label">Patients routed by department — today</div>
+        <div class="bar-chart" id="dept-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Triage severity distribution</div>
+        <div class="donut-container">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 36 36" width="120" height="120" id="donut-svg">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F0EDE6" stroke-width="3.2"/>
+            </svg>
+            <div class="donut-label">
+              <div class="donut-pct" id="donut-total">0</div>
+              <div class="donut-sub">patients</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-label">Recent Intake Records</div>
+      <table class="patients-table">
+        <thead>
+          <tr>
+            <th>Patient ID</th>
+            <th>Name</th>
+            <th>Chief Complaint</th>
+            <th>Priority</th>
+            <th>Department</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="dashboard-table-body">
+          <tr><td colspan="7" style="color:var(--text-3);text-align:center;padding:24px">No triage records yet today.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TRIAGE RESULT POPUP -->
+<div class="modal-overlay" id="triage-modal" onclick="if(event.target===this)closeTriageModal()">
+  <div class="modal-card">
+    <div class="modal-icon" id="modal-icon">✓</div>
+    <div class="modal-dept-badge p1" id="modal-dept-badge">—</div>
+    <div class="modal-title" id="modal-title">Please proceed to your assigned department</div>
+    <div class="modal-location" id="modal-location">—</div>
+    <div class="modal-priority" id="modal-priority">—</div>
+    <button class="btn btn-primary" style="width:100%" onclick="closeTriageModal()">Got it — Start new intake</button>
+  </div>
+</div>
+
+<script>
+  // ─────────────────────────────────────────────────────────
+  // CONFIG — swap in your Cloud Run URL after deploying
+  // ─────────────────────────────────────────────────────────
+  // const API_BASE = 'http://localhost:8080';
+  const API_BASE = 'https://triage-agent-5ud4ewzaea-el.a.run.app';
+// const API_BASE = 'http://localhost:8080';
+  // const API_BASE = 'https://YOUR-CLOUD-RUN-URL.a.run.app';
+  // For local dev use: const API_BASE = 'http://localhost:8080';
+
+  // ─────────────────────────────────────────────────────────
+  // PRESENTATION NAV
+  // ─────────────────────────────────────────────────────────
+  const screens = ['s0','s1','s2','s3'];
+  let current = 0;
+  let intakeStartTime = Date.now();
+  const DASHBOARD_KEY = 'takecare_triage_history';
+
+  function goTo(n) {
+    document.getElementById(screens[current]).classList.remove('active');
+    document.querySelectorAll('.nav-tab')[current].classList.remove('active');
+    current = n;
+    document.getElementById(screens[current]).classList.add('active');
+    document.querySelectorAll('.nav-tab')[current].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (n === 3) renderDashboard();
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // CHAT STATE
+  // ─────────────────────────────────────────────────────────
+  const chatMessages = [];
+  let patientCollected = {};
+  const INTAKE_GREETING =
+    "Hello! I'm your healthcare intake assistant. I'll ask a few questions to understand how you're feeling. May I have your full name, please?";
+
+  function resetChatSession() {
+    chatMessages.length = 0;
+    patientCollected = {};
+    document.getElementById('chat-window').innerHTML = '';
+    document.getElementById('rag-indicator').style.display = 'none';
+    hidePatientPanel();
+    clearPatientFields();
+    intakeStartTime = Date.now();
+    chatMessages.push({ role: 'assistant', content: INTAKE_GREETING });
+    appendMsg('bot', INTAKE_GREETING);
+    document.getElementById('chat-input').disabled = false;
+    document.getElementById('send-btn').disabled = false;
+  }
+
+  function initChat() {
+    resetChatSession();
+  }
+
+  function clearPatientFields() {
+    ['field-name', 'field-age', 'field-gender', 'field-complaint', 'field-onset', 'field-allergies', 'field-history'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('vitals-card').style.display = 'none';
+  }
+
+  function hasPatientDetails(collected) {
+    if (!collected) return false;
+    return !!(collected.name || collected.age || collected.gender ||
+      collected.chief_complaint || collected.symptoms);
+  }
+
+  function showPatientPanel() {
+    document.getElementById('patient-panel').classList.add('visible');
+    document.getElementById('intake-layout').classList.remove('chat-only');
+  }
+
+  function hidePatientPanel() {
+    document.getElementById('patient-panel').classList.remove('visible');
+    document.getElementById('intake-layout').classList.add('chat-only');
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // CHAT HELPERS
+  // ─────────────────────────────────────────────────────────
+  function appendMsg(role, text) {
+    const win   = document.getElementById('chat-window');
+    const isBot = role === 'bot';
+    const time  = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const msg = document.createElement('div');
+    msg.className = `msg ${role}`;
+    msg.innerHTML = `
+      <div class="msg-avatar">${isBot ? 'AI' : 'P'}</div>
+      <div>
+        <div class="msg-bubble">${text}</div>
+        <div class="msg-time">${time}</div>
+      </div>`;
+    win.appendChild(msg);
+    win.scrollTop = win.scrollHeight;
+  }
+
+  function showTyping() {
+    const win = document.getElementById('chat-window');
+    const el  = document.createElement('div');
+    el.className = 'msg bot';
+    el.id = 'typing-indicator';
+    el.innerHTML = `
+      <div class="msg-avatar">AI</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    win.appendChild(el);
+    win.scrollTop = win.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  function updatePatientPanel(collected) {
+    if (!collected) return;
+    patientCollected = { ...patientCollected, ...collected };
+    if (!hasPatientDetails(patientCollected)) return;
+
+    showPatientPanel();
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val) el.value = val;
+    };
+    set('field-name', patientCollected.name);
+    set('field-age', patientCollected.age);
+    set('field-gender', patientCollected.gender);
+    set('field-complaint', patientCollected.chief_complaint || patientCollected.symptoms);
+    set('field-onset', patientCollected.onset);
+    set('field-allergies', patientCollected.allergies);
+    const hist = [patientCollected.medications, patientCollected.medical_history].filter(Boolean).join('; ');
+    if (hist) {
+      document.getElementById('vitals-card').style.display = 'block';
+      set('field-history', hist);
+    }
+  }
+
+  async function runTriage(symptomsSummary) {
+    const btn = document.getElementById('send-btn');
+    btn.textContent = 'Triaging…';
+    showTyping();
+
+    try {
+      const res = await fetch(`${API_BASE}/triage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms: symptomsSummary })
+      });
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json();
+      removeTyping();
+      handleTriageResult(data);
+    } catch (err) {
+      removeTyping();
+      appendMsg('bot', `⚠️ Triage failed: ${err.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send →';
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // MAIN SEND HANDLER — conversational intake, then triage
+  // ─────────────────────────────────────────────────────────
+  async function handleSend() {
+    const input = document.getElementById('chat-input');
+    const btn   = document.getElementById('send-btn');
+    const text  = input.value.trim();
+    if (!text) return;
+
+    appendMsg('user', text);
+    chatMessages.push({ role: 'user', content: text });
+    input.value = '';
+
+    btn.disabled = true;
+    btn.textContent = '…';
+    showTyping();
+
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatMessages })
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.detail || `API error ${res.status}`);
+      }
+      const data = await res.json();
+      removeTyping();
+
+      appendMsg('bot', data.reply);
+      chatMessages.push({ role: 'assistant', content: data.reply });
+      updatePatientPanel(data.collected);
+
+      if (data.intake_complete && data.symptoms_summary) {
+        appendMsg('bot', 'Thank you. I have everything I need — running triage now…');
+        await runTriage(data.symptoms_summary);
+      }
+    } catch (err) {
+      removeTyping();
+      console.error(err);
+      appendMsg('bot',
+        `⚠️ Could not reach the server at <code>${API_BASE}</code>.<br>
+         <small style="color:var(--text-3)">${err.message}</small>`
+      );
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send →';
+    }
+  }
+
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSend();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeTriageModal();
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // POPULATE UI WITH REAL API RESPONSE
+  // ─────────────────────────────────────────────────────────
+  function formatDeptRouting(data) {
+    const dept = data.department || '';
+    const suffix = (!/emergency/i.test(dept) && data.priority <= 2) ? ' Emergency' : '';
+    return `${dept}${suffix} — Priority ${data.priority}`;
+  }
+
+  function showTriageModal(data) {
+    const p = data.priority;
+    const routing = formatDeptRouting(data);
+    const modal = document.getElementById('triage-modal');
+    const badge = document.getElementById('modal-dept-badge');
+    const icon = document.getElementById('modal-icon');
+
+    badge.textContent = routing;
+    badge.className = `modal-dept-badge p${p}`;
+    document.getElementById('modal-title').textContent = 'Please proceed to your assigned department';
+    document.getElementById('modal-location').textContent =
+      `Floor ${data.floor || '1'} · Room ${data.room || '101'}`;
+    document.getElementById('modal-priority').textContent =
+      `Priority ${p} — ${data.priority_label || 'See front desk'}`;
+
+    icon.className = `modal-icon${p <= 2 ? ' urgent' : ''}`;
+    icon.textContent = p <= 2 ? '!' : '✓';
+
+    document.getElementById('chat-window').innerHTML = '';
+    chatMessages.length = 0;
+    modal.classList.add('open');
+  }
+
+  function closeTriageModal() {
+    document.getElementById('triage-modal').classList.remove('open');
+    resetChatSession();
+  }
+
+  function loadTriageHistory() {
+    try {
+      const raw = localStorage.getItem(DASHBOARD_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  function saveTriageRecord(data) {
+    const history = loadTriageHistory();
+    const intakeMins = Math.max(1, Math.round((Date.now() - intakeStartTime) / 60000 * 10) / 10);
+    const record = {
+      id: `PAT-${4800 + history.length + 1}`,
+      name: patientCollected.name || 'Unknown',
+      complaint: patientCollected.chief_complaint || patientCollected.symptoms || '—',
+      priority: data.priority,
+      priority_label: data.priority_label,
+      department: data.department,
+      confidence: data.confidence,
+      time: new Date().toISOString(),
+      intake_mins: intakeMins,
+    };
+    const today = new Date().toDateString();
+    const todayRecords = history.filter(r => new Date(r.time).toDateString() === today);
+    todayRecords.push(record);
+    const older = history.filter(r => new Date(r.time).toDateString() !== today);
+    localStorage.setItem(DASHBOARD_KEY, JSON.stringify([...older, ...todayRecords]));
+    return record;
+  }
+
+  function renderDashboard() {
+    const today = new Date().toDateString();
+    const records = loadTriageHistory().filter(r => new Date(r.time).toDateString() === today);
+    const total = records.length;
+
+    document.getElementById('stat-patients').textContent = total;
+    document.getElementById('stat-patients-change').textContent =
+      total > 0 ? `${total} intake${total !== 1 ? 's' : ''} completed today` : 'No intakes yet';
+
+    const avgMins = total
+      ? (records.reduce((s, r) => s + (r.intake_mins || 3), 0) / total).toFixed(1)
+      : '—';
+    document.getElementById('stat-intake-time').innerHTML = total
+      ? `${avgMins}<span style="font-size:18px;font-family:var(--body-font)">min</span>` : '—';
+    document.getElementById('stat-intake-change').textContent =
+      total > 0 ? 'AI-assisted conversational intake' : '—';
+
+    const p1 = records.filter(r => r.priority === 1).length;
+    document.getElementById('stat-p1').textContent = p1;
+    document.getElementById('stat-p1-change').textContent =
+      p1 > 0 ? `${p1} immediate case${p1 !== 1 ? 's' : ''} today` : 'No P1 cases';
+
+    const highConf = records.filter(r => r.confidence === 'high').length;
+    const confPct = total ? Math.round((highConf / total) * 100) : 0;
+    document.getElementById('stat-confidence').innerHTML = total
+      ? `${confPct}<span style="font-size:18px;font-family:var(--body-font)">%</span>` : '—';
+    document.getElementById('stat-confidence-change').textContent =
+      total > 0 ? `${highConf} of ${total} high confidence` : '—';
+
+    const deptCounts = {};
+    records.forEach(r => { deptCounts[r.department] = (deptCounts[r.department] || 0) + 1; });
+    const deptSorted = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
+    const maxDept = deptSorted[0]?.[1] || 1;
+    const deptChart = document.getElementById('dept-chart');
+    if (!deptSorted.length) {
+      deptChart.innerHTML = '<p style="font-size:13px;color:var(--text-3);padding:12px 0">No routing data yet.</p>';
+    } else {
+      deptChart.innerHTML = deptSorted.map(([dept, count]) => `
+        <div class="bar-row">
+          <div class="bar-dept">${dept}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${Math.round((count / maxDept) * 100)}%">
+              <span class="bar-num">${count}</span>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    const priCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    records.forEach(r => { if (priCounts[r.priority] !== undefined) priCounts[r.priority]++; });
+    document.getElementById('donut-total').textContent = total;
+
+    const colors = { 1: '#C0392B', 2: '#B7580A', 3: '#3498DB', 4: '#1A5C4A' };
+    const labels = { 1: 'P1 — Immediate', 2: 'P2 — Urgent', 3: 'P3 — Less urgent', 4: 'P4 — Non-urgent' };
+    let offset = 25;
+    const svg = document.getElementById('donut-svg');
+    svg.innerHTML = '<circle cx="18" cy="18" r="15.9" fill="none" stroke="#F0EDE6" stroke-width="3.2"/>';
+    if (total > 0) {
+      [1, 2, 3, 4].forEach(p => {
+        const pct = (priCounts[p] / total) * 100;
+        if (pct > 0) {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', '18'); circle.setAttribute('cy', '18'); circle.setAttribute('r', '15.9');
+          circle.setAttribute('fill', 'none'); circle.setAttribute('stroke', colors[p]);
+          circle.setAttribute('stroke-width', '3.2');
+          circle.setAttribute('stroke-dasharray', `${pct} ${100 - pct}`);
+          circle.setAttribute('stroke-dashoffset', String(offset));
+          circle.setAttribute('stroke-linecap', 'round');
+          svg.appendChild(circle);
+          offset -= pct;
+        }
+      });
+    }
+    document.getElementById('donut-legend').innerHTML = [1, 2, 3, 4].map(p => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${colors[p]}"></div>
+        ${labels[p]} (${priCounts[p]})
+      </div>`).join('');
+
+    const tbody = document.getElementById('dashboard-table-body');
+    if (!records.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-3);text-align:center;padding:24px">No triage records yet today.</td></tr>';
+    } else {
+      const dotClass = { 1: 'p1-dot', 2: 'p2-dot', 3: 'p3-dot', 4: 'p4-dot' };
+      const badgeClass = { 1: 'badge-red', 2: 'badge-amber', 3: 'badge-blue', 4: 'badge-green' };
+      tbody.innerHTML = [...records].reverse().map(r => {
+        const t = new Date(r.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<tr>
+          <td><span style="font-family:var(--tag-font);font-size:12px;color:var(--text-3)">${r.id}</span></td>
+          <td style="font-weight:500">${r.name}</td>
+          <td>${r.complaint}</td>
+          <td><span class="priority-dot ${dotClass[r.priority]}"></span>P${r.priority}</td>
+          <td>${r.department}</td>
+          <td style="font-family:var(--tag-font);font-size:12px">${r.intake_mins}m · ${t}</td>
+          <td><span class="badge ${badgeClass[r.priority]}">${r.priority <= 2 ? 'Active' : 'Waiting'}</span></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  function handleTriageResult(data) {
+    const ragEl = document.getElementById('rag-indicator');
+    const chunksEl = document.getElementById('rag-chunks');
+    const scoreEl  = document.getElementById('rag-score');
+    if (data.retrieved_sources && data.retrieved_sources.length) {
+      ragEl.style.display = 'flex';
+      chunksEl.innerHTML = data.retrieved_sources
+        .map(s => `<span class="chunk-tag" title="score: ${s.score}">${slugify(s.title)}</span>`)
+        .join('');
+      scoreEl.textContent = `similarity: ${data.retrieved_sources[0].score.toFixed(2)}`;
+    }
+
+    populateTriageScreen(data);
+    populateHandoffScreen(data);
+    saveTriageRecord(data);
+    showTriageModal(data);
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // SCREEN 2 — TRIAGE RESULT
+  // ─────────────────────────────────────────────────────────
+  function populateTriageScreen(data) {
+    const p = data.priority;
+    document.getElementById('triage-empty').style.display = 'none';
+    document.getElementById('triage-results').style.display = 'block';
+
+    const bannerColors = { 1:'p1', 2:'p2', 3:'p3', 4:'p4' };
+    const bannerTextColors = { 1:'var(--red)', 2:'var(--amber)', 3:'#3498DB', 4:'var(--accent)' };
+    const banner = document.querySelector('#triage-results .severity-banner');
+    banner.className = `severity-banner ${bannerColors[p] || 'p1'}`;
+    banner.style.background = p === 1 ? 'var(--red-light)' :
+                              p === 2 ? 'var(--amber-light)' :
+                              p === 3 ? 'var(--blue-light)' : 'var(--accent-light)';
+    banner.style.borderColor = p === 1 ? '#F0B4AE' :
+                               p === 2 ? '#F0CEAE' :
+                               p === 3 ? '#AEC6F0' : '#B8DACD';
+
+    document.querySelector('#triage-results .severity-num').textContent = `P${p}`;
+    document.querySelector('#triage-results .severity-num').style.color = bannerTextColors[p];
+    const h2 = document.querySelector('#triage-results .severity-info h2');
+    h2.textContent = `Priority ${p} — ${data.priority_label}`;
+    h2.style.color = bannerTextColors[p];
+
+    const topSource = data.retrieved_sources?.[0]?.title || 'knowledge_base';
+    document.querySelector('#triage-results .severity-info p').innerHTML =
+      `RAG retrieval · Confidence: <strong>${data.confidence}</strong> · KB: <em>${slugify(topSource)}</em>`;
+
+    const urgencyBadge = document.getElementById('urgency-badge');
+    urgencyBadge.textContent = p <= 2 ? 'URGENT' : 'ROUTINE';
+    urgencyBadge.className = `badge ${p <= 2 ? 'badge-red' : 'badge-gray'}`;
+
+    const deptCard = document.querySelector('#triage-results .dept-name');
+    if (deptCard) deptCard.textContent = data.department;
+
+    const pills = [
+      patientCollected.chief_complaint,
+      patientCollected.symptoms,
+      patientCollected.onset,
+      patientCollected.allergies ? `Allergy: ${patientCollected.allergies}` : null,
+    ].filter(Boolean);
+    document.getElementById('symptom-list').innerHTML = pills
+      .map(t => `<span class="symptom-pill${p <= 2 ? ' flagged' : ''}">${t}</span>`)
+      .join('');
+
+    const ragList = document.getElementById('rag-context-list');
+    if (data.retrieved_sources?.length) {
+      ragList.innerHTML = data.retrieved_sources
+        .map(s => `<div style="margin-bottom:8px"><strong>${s.title}</strong> (${s.score.toFixed(2)})</div>`)
+        .join('');
+    }
+
+    const patId = `PAT-${Math.floor(4800 + Math.random() * 100)}`;
+    const jsonOut = {
+      patient_id: patId,
+      patient_name: patientCollected.name,
+      triage_severity: p,
+      department: data.department,
+      priority_label: data.priority_label,
+      confidence: data.confidence,
+      rationale: data.rationale,
+      rag_sources: (data.retrieved_sources || []).map(s => s.title),
+    };
+    document.getElementById('json-output').textContent = JSON.stringify(jsonOut, null, 2);
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // SCREEN 3 — HANDOFF NOTE
+  // ─────────────────────────────────────────────────────────
+  function populateHandoffScreen(data) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    const timeStr = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+
+    document.getElementById('note-meta').innerHTML =
+      `Date: ${dateStr}<br>Time: ${timeStr}<br>Ref: PAT-${Math.floor(4800 + Math.random() * 100)}`;
+
+    const ag = patientCollected.age && patientCollected.gender
+      ? `${patientCollected.age} / ${patientCollected.gender}` : (patientCollected.age || patientCollected.gender || '—');
+
+    document.getElementById('note-patient-id').innerHTML = `
+      <span class="note-field-label">Name</span><span class="note-field-value">${patientCollected.name || '—'}</span>
+      <span class="note-field-label">Age / Gender</span><span class="note-field-value">${ag}</span>
+      <span class="note-field-label">Allergies</span><span class="note-field-value">${patientCollected.allergies || 'None reported'}</span>`;
+
+    document.getElementById('note-complaint').innerHTML =
+      `<strong>${patientCollected.chief_complaint || 'Chief complaint'}</strong><br>${patientCollected.symptoms || ''}<br>Onset: ${patientCollected.onset || '—'}`;
+
+    document.getElementById('note-assessment').innerHTML =
+      `<strong>${data.department}</strong> — Priority ${data.priority} (${data.priority_label})<br><br>${data.rationale}<br><br>Confidence: ${data.confidence}`;
+
+    document.getElementById('note-routing').textContent =
+      `Patient routed to ${data.department}. ${data.priority <= 2 ? 'Urgent — immediate clinical review advised.' : 'Standard queue.'}`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // UTILITY
+  // ─────────────────────────────────────────────────────────
+  function slugify(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
+  }
+
+  initChat();
+  renderDashboard();
+</script>
+</body>
+</html>

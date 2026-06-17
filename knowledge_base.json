@@ -1,0 +1,227 @@
+[
+  {
+    "id": "KB001",
+    "title": "Chest pain with radiation to left arm",
+    "department": "Cardiology Emergency",
+    "priority": 1,
+    "content": "Chest pain radiating to the left arm, jaw, or shoulder \u2014 especially when accompanied by sweating, nausea, or shortness of breath \u2014 is a classic presentation of acute myocardial infarction (heart attack). Immediate triage to Cardiology Emergency. Priority 1: Critical. Administer oxygen, obtain ECG within 10 minutes, and activate the cardiac catheterization lab if STEMI is confirmed.",
+    "floor": "2",
+    "room": "204"
+  },
+  {
+    "id": "KB002",
+    "title": "Pediatric high fever above 104\u00b0F",
+    "department": "Pediatrics Emergency",
+    "priority": 1,
+    "content": "A child with a fever above 104\u00b0F (40\u00b0C) lasting more than 24 hours requires urgent evaluation. Risk of febrile seizures is elevated. If the child is under 3 months old with any fever above 100.4\u00b0F, treat as Priority 1. Assess for signs of meningitis (stiff neck, light sensitivity, rash). Triage to Pediatrics Emergency immediately.",
+    "floor": "3",
+    "room": "301"
+  },
+  {
+    "id": "KB003",
+    "title": "Stroke symptoms \u2014 FAST protocol",
+    "department": "Neurology Emergency",
+    "priority": 1,
+    "content": "FAST: Face drooping, Arm weakness, Speech difficulty, Time to call emergency. Any sudden onset of these symptoms indicates a possible stroke. Triage Priority 1 to Neurology Emergency. Thrombolytic therapy window is 4.5 hours from symptom onset. Immediate CT scan required. Do not give food or water \u2014 aspiration risk.",
+    "floor": "4",
+    "room": "402"
+  },
+  {
+    "id": "KB004",
+    "title": "Severe allergic reaction \u2014 anaphylaxis",
+    "department": "Emergency Medicine",
+    "priority": 1,
+    "content": "Anaphylaxis presents with hives, swelling of throat/tongue, difficulty breathing, drop in blood pressure, and rapid pulse following exposure to an allergen. Administer epinephrine (EpiPen) immediately. Triage to Emergency Medicine, Priority 1 Critical. Patient may require airway management. Keep patient supine with legs elevated.",
+    "floor": "1",
+    "room": "118"
+  },
+  {
+    "id": "KB005",
+    "title": "Difficulty breathing \u2014 acute respiratory distress",
+    "department": "Pulmonology Emergency",
+    "priority": 1,
+    "content": "Acute onset shortness of breath with oxygen saturation below 90%, use of accessory muscles, and inability to complete sentences indicates respiratory distress. Could indicate severe asthma, pulmonary embolism, or pneumothorax. Priority 1 \u2014 Pulmonology Emergency. Administer oxygen immediately, prepare for possible intubation.",
+    "floor": "2",
+    "room": "215"
+  },
+  {
+    "id": "KB006",
+    "title": "Abdominal pain \u2014 severe and sudden onset",
+    "department": "General Surgery Emergency",
+    "priority": 2,
+    "content": "Sudden severe abdominal pain, especially with board-like rigidity, rebound tenderness, or guarding, suggests peritonitis, appendicitis, or ruptured viscus. Priority 2 Urgent \u2014 General Surgery Emergency. Obtain CT abdomen and pelvis with contrast. Keep patient nil by mouth. Monitor vitals every 15 minutes.",
+    "floor": "1",
+    "room": "112"
+  },
+  {
+    "id": "KB007",
+    "title": "High blood pressure \u2014 hypertensive crisis",
+    "department": "Cardiology",
+    "priority": 2,
+    "content": "Blood pressure above 180/120 mmHg with symptoms such as headache, visual changes, chest pain, or confusion constitutes a hypertensive emergency. Priority 2 Urgent \u2014 Cardiology. Gradual blood pressure reduction required (do not lower too rapidly). Assess for end-organ damage including kidneys, brain, and heart.",
+    "floor": "2",
+    "room": "208"
+  },
+  {
+    "id": "KB008",
+    "title": "Diabetic patient \u2014 altered consciousness, possible hypoglycemia",
+    "department": "Endocrinology Emergency",
+    "priority": 2,
+    "content": "A known diabetic patient presenting with confusion, sweating, tremors, or unconsciousness may be experiencing severe hypoglycemia (blood sugar below 70 mg/dL). Priority 2 Urgent \u2014 Endocrinology Emergency or General ED. Administer oral glucose if conscious, IV dextrose if unconscious. Check blood glucose immediately.",
+    "floor": "2",
+    "room": "212"
+  },
+  {
+    "id": "KB009",
+    "title": "Head trauma \u2014 fall or blunt force",
+    "department": "Neurosurgery Emergency",
+    "priority": 2,
+    "content": "Head injury with loss of consciousness, confusion, vomiting, or unequal pupils may indicate intracranial hemorrhage or traumatic brain injury. Priority 2 Urgent \u2014 Neurosurgery Emergency. Immobilize cervical spine. Obtain CT head without contrast urgently. Monitor Glasgow Coma Scale every 30 minutes.",
+    "floor": "4",
+    "room": "410"
+  },
+  {
+    "id": "KB010",
+    "title": "Burns \u2014 moderate to severe",
+    "department": "Burns Unit",
+    "priority": 2,
+    "content": "Burns covering more than 10% of body surface area, burns to the face, hands, genitals, feet, or major joints, and all full-thickness burns are Priority 2 Urgent. Direct to the Burns Unit. Immediate fluid resuscitation (Parkland formula). Cover with sterile dressing. Do not apply ice \u2014 hypothermia risk.",
+    "floor": "1",
+    "room": "105"
+  },
+  {
+    "id": "KB011",
+    "title": "Suspected fracture \u2014 limb",
+    "department": "Orthopaedics",
+    "priority": 3,
+    "content": "A patient with limb deformity, inability to bear weight, bruising, or swelling following trauma may have a fracture. Priority 3 Semi-urgent \u2014 Orthopaedics. Immobilise the limb with a splint before imaging. Obtain X-ray of suspected area. Assess neurovascular status distal to the injury (pulse, sensation, movement).",
+    "floor": "3",
+    "room": "318"
+  },
+  {
+    "id": "KB012",
+    "title": "Urinary tract infection \u2014 fever and flank pain",
+    "department": "Urology / General Medicine",
+    "priority": 3,
+    "content": "UTI with high fever (above 38.5\u00b0C), flank pain, and rigors suggests pyelonephritis (kidney infection). Priority 3 Semi-urgent \u2014 Urology or General Medicine. Urine culture and blood cultures required. IV antibiotics if systemically unwell. Ensure adequate hydration.",
+    "floor": "3",
+    "room": "305"
+  },
+  {
+    "id": "KB013",
+    "title": "Mental health crisis \u2014 suicidal ideation",
+    "department": "Psychiatry Emergency",
+    "priority": 2,
+    "content": "A patient expressing active suicidal ideation with a plan or recent attempt requires immediate psychiatric evaluation. Priority 2 Urgent \u2014 Psychiatry Emergency. Do not leave patient alone. Remove access to potential means of harm. Involve mental health crisis team. Ensure a calm, non-stimulating environment.",
+    "floor": "5",
+    "room": "501"
+  },
+  {
+    "id": "KB014",
+    "title": "Eye injury \u2014 chemical splash",
+    "department": "Ophthalmology Emergency",
+    "priority": 2,
+    "content": "Chemical splash to the eye requires immediate and continuous irrigation with normal saline or water for at least 20\u201330 minutes. Priority 2 Urgent \u2014 Ophthalmology Emergency. Check and document visual acuity. Alkali burns are more dangerous than acid burns due to deeper tissue penetration. Urgent ophthalmology review.",
+    "floor": "2",
+    "room": "220"
+  },
+  {
+    "id": "KB015",
+    "title": "Ear pain and discharge \u2014 possible otitis media",
+    "department": "ENT Outpatient",
+    "priority": 4,
+    "content": "Mild to moderate ear pain with discharge in an otherwise well patient is consistent with otitis media or external ear infection. Priority 4 Non-urgent \u2014 ENT Outpatient. Prescribe analgesia. Antibiotic ear drops if discharge is present. Follow up with GP in 48 hours if not improving.",
+    "floor": "3",
+    "room": "312"
+  },
+  {
+    "id": "KB016",
+    "title": "Minor laceration \u2014 superficial wound",
+    "department": "Minor Injuries Unit",
+    "priority": 4,
+    "content": "Small superficial cuts with controlled or minimal bleeding and no involvement of tendons, nerves, or deep structures are Priority 4 Non-urgent. Direct to Minor Injuries Unit. Clean with saline, close with steri-strips or sutures if needed. Tetanus prophylaxis if not up to date. Discharge with wound care instructions.",
+    "floor": "1",
+    "room": "102"
+  },
+  {
+    "id": "KB017",
+    "title": "Pregnancy \u2014 active labour or complications",
+    "department": "Obstetrics Emergency",
+    "priority": 1,
+    "content": "A pregnant patient presenting with regular contractions, rupture of membranes, heavy vaginal bleeding, or sudden severe abdominal pain must be triaged to Obstetrics Emergency immediately. Priority 1 Critical. Assess gestational age, foetal heart rate, and maternal vitals. Prepare delivery suite if labour is imminent.",
+    "floor": "2",
+    "room": "230"
+  },
+  {
+    "id": "KB018",
+    "title": "Overdose \u2014 suspected drug or medication",
+    "department": "Toxicology / Emergency Medicine",
+    "priority": 1,
+    "content": "Suspected overdose with reduced consciousness, abnormal vital signs, or unknown substance ingestion is Priority 1 Critical \u2014 Toxicology/Emergency Medicine. Secure airway. Contact Poison Control. Administer naloxone if opioid overdose suspected. Obtain ECG (risk of arrhythmia with many toxins). Do not induce vomiting.",
+    "floor": "1",
+    "room": "120"
+  },
+  {
+    "id": "KB019",
+    "title": "Lower back pain \u2014 chronic, no red flags",
+    "department": "General Outpatient / Physiotherapy",
+    "priority": 4,
+    "content": "Chronic lower back pain without red flags (no fever, no neurological deficit, no trauma, no unexplained weight loss) is non-urgent. Priority 4 \u2014 General Outpatient or Physiotherapy referral. Prescribe NSAIDs or paracetamol. Advise continued movement. Refer for physiotherapy. Red flags that would escalate: bowel/bladder dysfunction, bilateral leg weakness.",
+    "floor": "1",
+    "room": "110"
+  },
+  {
+    "id": "KB020",
+    "title": "Skin rash \u2014 widespread, with fever",
+    "department": "Dermatology / Infectious Disease",
+    "priority": 2,
+    "content": "A widespread rash with fever may indicate a serious systemic infection, drug reaction (Stevens-Johnson Syndrome), or meningococcemia. Priority 2 Urgent \u2014 Dermatology or Infectious Disease. Non-blanching petechial rash with fever is a medical emergency (possible meningococcal disease) \u2014 escalate to Priority 1. Blood cultures and IV antibiotics must not be delayed.",
+    "floor": "3",
+    "room": "308"
+  },
+  {
+    "id": "KB021",
+    "title": "Seizure \u2014 first episode or prolonged",
+    "department": "Neurology Emergency",
+    "priority": 1,
+    "content": "A first-time seizure or seizure lasting more than 5 minutes (status epilepticus) is Priority 1 Critical \u2014 Neurology Emergency. Protect patient from injury. Time the seizure. Administer benzodiazepines if seizure is ongoing. Check blood glucose immediately \u2014 hypoglycaemia is a common reversible cause. CT head and EEG required.",
+    "floor": "4",
+    "room": "402"
+  },
+  {
+    "id": "KB022",
+    "title": "Vomiting and diarrhoea \u2014 dehydration risk",
+    "department": "General Medicine",
+    "priority": 3,
+    "content": "Persistent vomiting and diarrhoea with signs of dehydration (dry mucous membranes, reduced skin turgor, tachycardia) is Priority 3 Semi-urgent \u2014 General Medicine. IV fluids if oral rehydration is not tolerated. Stool culture if infective cause suspected. Monitor electrolytes. Oral rehydration therapy for mild cases.",
+    "floor": "3",
+    "room": "302"
+  },
+  {
+    "id": "KB023",
+    "title": "Dental pain \u2014 severe toothache or abscess",
+    "department": "Dental Emergency",
+    "priority": 3,
+    "content": "Severe dental pain with facial swelling, fever, or difficulty swallowing may indicate a dental abscess with risk of spread to deep neck spaces (Ludwig's angina). Priority 3 Semi-urgent \u2014 Dental Emergency. If dysphagia or trismus is present, escalate to Priority 2. Prescribe antibiotics and analgesia. Dental drainage may be required.",
+    "floor": "2",
+    "room": "225"
+  },
+  {
+    "id": "KB024",
+    "title": "Cardiac arrhythmia \u2014 palpitations and dizziness",
+    "department": "Cardiology",
+    "priority": 2,
+    "content": "Palpitations with dizziness, near-syncope, or syncope may indicate a significant cardiac arrhythmia. Priority 2 Urgent \u2014 Cardiology. Obtain 12-lead ECG immediately. Monitor cardiac rhythm continuously. Common causes include atrial fibrillation, SVT, and ventricular tachycardia. If haemodynamically unstable, escalate to Priority 1.",
+    "floor": "2",
+    "room": "208"
+  },
+  {
+    "id": "KB025",
+    "title": "Routine vaccination or health check",
+    "department": "General Outpatient",
+    "priority": 4,
+    "content": "Patients presenting for scheduled vaccinations, routine blood tests, prescription renewals, or wellness checks are Priority 4 Non-urgent \u2014 General Outpatient. No acute medical assessment required. Direct to scheduled appointment queue. Ensure patient has no acute symptoms before proceeding with routine care.",
+    "floor": "1",
+    "room": "108"
+  }
+]
